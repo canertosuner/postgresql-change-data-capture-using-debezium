@@ -55,7 +55,7 @@ update transaction set amount=77 where id=85
 
 **You will see the messages consumed by consumer as blow;**
 
-**Insertion payload with "op" : "c"**
+**Insert message-payload with "op" : "c"**
 ```
 {
    "payload":{
@@ -85,7 +85,7 @@ update transaction set amount=77 where id=85
 ```
 
 
-**Update payload with "op" : "u"**
+**Update message-payload with "op" : "u"**
 ```
 {
    "payload":{
