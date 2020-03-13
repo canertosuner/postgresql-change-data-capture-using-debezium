@@ -1,0 +1,44 @@
+version: '3.1'
+services:
+    postgres:
+        image: debezium/postgres
+        environment:
+          POSTGRES_PASSWORD: qwerty
+          POSTGRES_USER: appuser
+        volumes:
+           - ./postgres:/data/postgres
+        ports:
+          - 6532:6532
+    zookeeper:
+        image: confluentinc/cp-zookeeper
+        ports:
+          - "2181:2181"
+        environment:
+          ZOOKEEPER_CLIENT_PORT: 2181
+    kafka:
+        image: confluentinc/cp-kafka
+        depends_on:
+          - zookeeper
+          - postgres
+        ports:
+          - "9092:9092"
+        environment:
+          KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+          KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+          KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+          KAFKA_LOG_CLEANER_DELETE_RETENTION_MS: 5000
+          KAFKA_BROKER_ID: 1
+          KAFKA_MIN_INSYNC_REPLICAS: 1
+    connector:
+        image: debezium/connect:latest
+        ports:
+          - "8083:8083"
+        environment:
+          GROUP_ID: 1
+          CONFIG_STORAGE_TOPIC: my_connect_configs
+          OFFSET_STORAGE_TOPIC: my_connect_offsets
+          BOOTSTRAP_SERVERS: kafka:9092
+        depends_on:
+          - zookeeper
+          - postgres
+          - kafka
